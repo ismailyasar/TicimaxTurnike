@@ -1,0 +1,2 @@
+# TicimaxTurnike
+Ticimax Case Project
