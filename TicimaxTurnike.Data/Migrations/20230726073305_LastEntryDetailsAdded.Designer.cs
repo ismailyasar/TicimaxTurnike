@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TicimaxTurnike.Data.Concrete;
@@ -11,9 +12,11 @@ using TicimaxTurnike.Data.Concrete;
 namespace TicimaxTurnike.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230726073305_LastEntryDetailsAdded")]
+    partial class LastEntryDetailsAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,19 +58,12 @@ namespace TicimaxTurnike.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Day")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("PersonId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -114,7 +110,7 @@ namespace TicimaxTurnike.Data.Migrations
             modelBuilder.Entity("TicimaxTurnike.Entity.LastEntryDetail", b =>
                 {
                     b.HasOne("TicimaxTurnike.Entity.Person", "Person")
-                        .WithMany("LastEntryDetails")
+                        .WithMany()
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -125,8 +121,6 @@ namespace TicimaxTurnike.Data.Migrations
             modelBuilder.Entity("TicimaxTurnike.Entity.Person", b =>
                 {
                     b.Navigation("Entries");
-
-                    b.Navigation("LastEntryDetails");
                 });
 #pragma warning restore 612, 618
         }

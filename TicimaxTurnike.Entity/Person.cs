@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TicimaxTurnike.Entity;
 
 public class Person
@@ -7,6 +9,10 @@ public class Person
     public string Surname { get; set; }
     public bool IsDisabled { get; set; }
 
+    [JsonIgnore]
     public List<Entry> Entries { get; set; }
     
+    [JsonIgnore]
+    public List<LastEntryDetail> LastEntryDetails { get; set; }
+
 }

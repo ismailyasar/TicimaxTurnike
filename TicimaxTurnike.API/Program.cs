@@ -1,5 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
+using TicimaxTurnike.API.BackgroundService;
+using TicimaxTurnike.API.Mappings;
+using TicimaxTurnike.API.Services;
+using TicimaxTurnike.Data.Abstract;
 using TicimaxTurnike.Data.Concrete;
+using TicimaxTurnike.Data.Concrete.EntityFramework;
+using TicimaxTurnike.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +20,28 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<AppDbContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"));
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior",true);
 });
+
+builder.Services.AddScoped(typeof(IRepository<>),typeof(Repository<>));
+builder.Services.AddScoped<IEntryRepository, EntryRepository>();
+builder.Services.AddScoped<ILastEntryDetailRepository, LastEntryDetailRepository>();
+
+builder.Services.AddAutoMapper(typeof(EntryProfile));
+
+//Rabbit MQ
+builder.Services.AddSingleton(sp => new ConnectionFactory()
+{
+    HostName = builder.Configuration.GetSection("RabbitMQConnectionInfo").GetSection("Host").Value,
+    UserName = builder.Configuration.GetSection("RabbitMQConnectionInfo").GetSection("Username").Value,
+    Password= builder.Configuration.GetSection("RabbitMQConnectionInfo").GetSection("Password").Value,
+    DispatchConsumersAsync = true
+    
+});
+builder.Services.AddSingleton<RabbitMQClientService>();
+builder.Services.AddSingleton<RabbitMQPublisher>();
+builder.Services.AddHostedService<LastEntryAddService>();
+
 
 var app = builder.Build();
 
